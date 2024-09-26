@@ -7,7 +7,7 @@ const Sidebar = ({ components }) => {
       <h3 className="font-bold mb-2">Components</h3>
       {components.map((component, index) => (
         <Draggable 
-          key={`${component.type}-${index}`} // Ensure a unique key
+          key={`${component.type}-${index}`}
           draggableId={`${component.type}-${index}`} 
           index={index}
         >
@@ -17,7 +17,7 @@ const Sidebar = ({ components }) => {
               {...provided.draggableProps}
               {...provided.dragHandleProps}
               className="draggable-item p-2 border border-gray-200 rounded mb-2 cursor-pointer bg-white shadow-sm hover:bg-gray-100 transition duration-200"
-              aria-label={`Drag ${component.label}`} // Accessibility improvement
+              aria-label={`Drag ${component.label}`}
             >
               {component.label}
             </div>
