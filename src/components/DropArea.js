@@ -1,127 +1,88 @@
-// src/components/DropArea.js
-import React, { useState } from 'react'; // Import useState to manage range value
+import React, { useState, useEffect } from 'react';
 import { Droppable, Draggable } from '@hello-pangea/dnd';
+import FormComponent from './FormComponent';
 
 const DropArea = ({ droppedComponents }) => {
-  const [rangeValues, setRangeValues] = useState({}); // State to hold range values
+  const [submittedData, setSubmittedData] = useState([]);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [editableLabels, setEditableLabels] = useState({});
+  const [editablePlaceholders, setEditablePlaceholders] = useState({});
+  const [hasError, setHasError] = useState(false);
+  const [errorFields, setErrorFields] = useState([]);
 
-  const renderComponent = (component, isRequired) => {
-    switch (component.type) {
-      case 'input':
-        return (
-          <div>
-            <input
-              type="text"
-              placeholder="Enter text"
-              className="w-full p-2 border rounded"
-              required={isRequired}
-            />
-            {isRequired && <span className="text-red-500">*</span>}
-          </div>
-        );
-      case 'textarea':
-        return (
-          <div>
-            <textarea
-              placeholder="Enter your message"
-              className="w-full p-2 border rounded"
-              rows="3"
-              required={isRequired}
-            />
-            {isRequired && <span className="text-red-500">*</span>}
-          </div>
-        );
-      case 'select':
-        return (
-          <div>
-            <select className="w-full p-2 border rounded" required={isRequired}>
-              <option>Option 1</option>
-              <option>Option 2</option>
-              <option>Option 3</option>
-            </select>
-            {isRequired && <span className="text-red-500">*</span>}
-          </div>
-        );
-      case 'checkbox':
-        return (
-          <label>
-            <input type="checkbox" className="mr-2" required={isRequired} /> Checkbox
-            {isRequired && <span className="text-red-500">*</span>}
-          </label>
-        );
-      case 'radio':
-        return (
-          <label>
-            <input type="radio" name="radio-group" className="mr-2" required={isRequired} /> Radio Button
-            {isRequired && <span className="text-red-500">*</span>}
-          </label>
-        );
-      case 'date':
-        return (
-          <div>
-            <input type="date" className="w-full p-2 border rounded" required={isRequired} />
-            {isRequired && <span className="text-red-500">*</span>}
-          </div>
-        );
-      case 'file':
-        return (
-          <div>
-            <input type="file" className="w-full p-2 border rounded" required={isRequired} />
-            {isRequired && <span className="text-red-500">*</span>}
-          </div>
-        );
-      case 'email':
-        return (
-          <div>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="w-full p-2 border rounded"
-              required={isRequired}
-            />
-            {isRequired && <span className="text-red-500">*</span>}
-          </div>
-        );
-      case 'number':
-        return (
-          <div>
-            <input
-              type="number"
-              placeholder="Enter a number"
-              className="w-full p-2 border rounded"
-              required={isRequired}
-            />
-            {isRequired && <span className="text-red-500">*</span>}
-          </div>
-        );
-      case 'range':
-        return (
-          <div>
-            <input
-              type="range"
-              min="0"
-              max="150"
-              className="w-full"
-              required={isRequired}
-              onChange={(e) => handleRangeChange(e, component.id)} // Update value on change
-            />
-            <span className="block text-center mt-2">
-              {rangeValues[component.id] !== undefined ? rangeValues[component.id] : 0} {/* Display range value */}
-            </span>
-            {isRequired && <span className="text-red-500">*</span>}
-          </div>
-        );
-      default:
-        return null;
-    }
+  useEffect(() => {
+    const initialData = droppedComponents.map(component => ({
+      id: component.id,
+      label: component.label,
+      value: component.value || '', // Ensure value is set correctly
+      type: component.type,
+      required: component.required || false,
+    }));
+    setSubmittedData(initialData);
+  }, [droppedComponents]);
+
+  const handleLabelChange = (id, newLabel) => {
+    setEditableLabels(prev => ({ ...prev, [id]: newLabel }));
   };
 
-  // Function to handle range value changes
-  const handleRangeChange = (event, id) => {
-    setRangeValues((prev) => ({
-      ...prev,
-      [id]: event.target.value, // Store the current value of the range
-    }));
+  const handlePlaceholderChange = (id, newPlaceholder) => {
+    setEditablePlaceholders(prev => ({ ...prev, [id]: newPlaceholder }));
+  };
+
+  const handleInputChange = (id, value) => {
+    setSubmittedData(prev =>
+      prev.map(item => (item.id === id ? { ...item, value } : item))
+    );
+  };
+
+  const handleSubmit = () => {
+    const errorFieldsTemp = submittedData
+      .filter(item => item.required && !item.value)
+      .map(item => item.label);
+
+    if (errorFieldsTemp.length > 0) {
+      setErrorFields(errorFieldsTemp);
+      setHasError(true);
+      return;
+    }
+
+    setHasError(false);
+    setIsFormVisible(true);
+  };
+
+  const renderFinalForm = () => {
+    return submittedData.map(data => (
+      <div key={data.id} className="mb-4">
+        <label className="block font-bold">{editableLabels[data.id] || data.label}:</label>
+        {data.type === 'checkbox' ? (
+          <input
+            type="checkbox"
+            checked={data.value}
+            readOnly // Set to false to allow interaction
+            onChange={() => handleInputChange(data.id, !data.value)} // Toggle checkbox value
+            className="mr-2"
+            aria-label={editableLabels[data.id] || data.label}
+          />
+        ) : data.type === 'textarea' ? (
+          <textarea
+            value={data.value}
+            placeholder={editablePlaceholders[data.id] || "Enter text"}
+            onChange={e => handleInputChange(data.id, e.target.value)} // Allow textarea editing
+            className="border border-gray-300 p-2 rounded mt-1 w-full"
+            aria-label={editablePlaceholders[data.id] || "Enter text"}
+          />
+        ) : (
+          <input
+            type={data.type}
+            value={data.value}
+            placeholder={editablePlaceholders[data.id] || "Enter text"}
+            onChange={e => handleInputChange(data.id, e.target.value)} // Allow input editing
+            className="border border-gray-300 p-2 rounded mt-1 w-full"
+            aria-label={editablePlaceholders[data.id] || "Enter text"}
+          />
+        )}
+      </div>
+    ));
   };
 
   return (
@@ -145,13 +106,50 @@ const DropArea = ({ droppedComponents }) => {
                     {...provided.dragHandleProps}
                     className="dropped-item p-2 border border-gray-200 rounded mb-2 bg-white shadow-sm"
                   >
-                    {renderComponent(component, index < 3)} {/* Mark the first three as required */}
+                    <FormComponent
+                      component={component}
+                      label={editableLabels[component.id] || component.label}
+                      placeholder={editablePlaceholders[component.id] || "Enter text"}
+                      handleInputChange={handleInputChange}
+                      handleLabelChange={handleLabelChange}
+                      handlePlaceholderChange={handlePlaceholderChange}
+                    />
                   </div>
                 )}
               </Draggable>
             ))
           )}
           {provided.placeholder}
+
+          <button
+            onClick={handleSubmit}
+            className="mt-4 p-2 bg-blue-500 text-white rounded"
+            aria-label="Create Form"
+          >
+            Create Form
+          </button>
+
+          {hasError && (
+            <div className="text-red-500 mt-2" role="alert">
+              Please fill out all required fields: {errorFields.join(', ')}.
+            </div>
+          )}
+
+          {isFormVisible && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white p-6 rounded shadow-lg w-1/3">
+                <h4 className="font-bold mb-4">Generated Form:</h4>
+                {renderFinalForm()}
+                <button
+                  onClick={() => setIsFormVisible(false)}
+                  className="mt-4 p-2 bg-red-500 text-white rounded"
+                  aria-label="Close Form"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </Droppable>
@@ -159,4 +157,3 @@ const DropArea = ({ droppedComponents }) => {
 };
 
 export default DropArea;
-
