@@ -17,6 +17,7 @@ const DropArea = ({ droppedComponents }) => {
       value: component.value || '', // Ensure value is set correctly
       type: component.type,
       required: component.required || false,
+      options: component.options || [], // Initialize options for select components
     }));
     setSubmittedData(initialData);
   }, [droppedComponents]);
@@ -53,33 +54,55 @@ const DropArea = ({ droppedComponents }) => {
   const renderFinalForm = () => {
     return submittedData.map(data => (
       <div key={data.id} className="mb-4">
-        <label className="block font-bold">{editableLabels[data.id] || data.label}:</label>
-        {data.type === 'checkbox' ? (
-          <input
-            type="checkbox"
-            checked={data.value}
-            readOnly // Set to false to allow interaction
-            onChange={() => handleInputChange(data.id, !data.value)} // Toggle checkbox value
-            className="mr-2"
-            aria-label={editableLabels[data.id] || data.label}
-          />
-        ) : data.type === 'textarea' ? (
-          <textarea
-            value={data.value}
-            placeholder={editablePlaceholders[data.id] || "Enter text"}
-            onChange={e => handleInputChange(data.id, e.target.value)} // Allow textarea editing
-            className="border border-gray-300 p-2 rounded mt-1 w-full"
-            aria-label={editablePlaceholders[data.id] || "Enter text"}
-          />
+        {/* Remove the label for the button type */}
+        {data.type === 'button' ? (
+          <button className="p-2 bg-blue-500 text-white rounded mt-1">
+            {editableLabels[data.id] || 'Button'}
+          </button>
         ) : (
-          <input
-            type={data.type}
-            value={data.value}
-            placeholder={editablePlaceholders[data.id] || "Enter text"}
-            onChange={e => handleInputChange(data.id, e.target.value)} // Allow input editing
-            className="border border-gray-300 p-2 rounded mt-1 w-full"
-            aria-label={editablePlaceholders[data.id] || "Enter text"}
-          />
+          <>
+            <label className="block font-bold">{editableLabels[data.id] || data.label}:</label>
+            {data.type === 'checkbox' ? (
+              <input
+                type="checkbox"
+                checked={data.value}
+                readOnly
+                onChange={() => handleInputChange(data.id, !data.value)} // Toggle checkbox value
+                className="mr-2"
+                aria-label={editableLabels[data.id] || data.label}
+              />
+            ) : data.type === 'textarea' ? (
+              <textarea
+                value={data.value}
+                placeholder={editablePlaceholders[data.id] || "Enter text"}
+                onChange={e => handleInputChange(data.id, e.target.value)} // Allow textarea editing
+                className="border border-gray-300 p-2 rounded mt-1 w-full"
+                aria-label={editablePlaceholders[data.id] || "Enter text"}
+              />
+            ) : data.type === 'select' ? (
+              <select
+                value={data.value}
+                onChange={e => handleInputChange(data.id, e.target.value)}
+                className="border border-gray-300 p-2 rounded mt-1 w-full"
+                aria-label={editablePlaceholders[data.id] || "Select option"}
+              >
+                {data.options.map((option, index) => (
+                  <option key={index} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type={data.type}
+                value={data.value}
+                placeholder={editablePlaceholders[data.id] || "Enter text"}
+                onChange={e => handleInputChange(data.id, e.target.value)} // Allow input editing
+                className="border border-gray-300 p-2 rounded mt-1 w-full"
+                aria-label={editablePlaceholders[data.id] || "Enter text"}
+              />
+            )}
+          </>
         )}
       </div>
     ));

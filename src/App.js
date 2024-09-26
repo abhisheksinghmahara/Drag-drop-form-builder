@@ -17,7 +17,15 @@ const App = () => {
     { type: 'file', label: 'File Upload' },
     { type: 'number', label: 'Number Input' },
     { type: 'email', label: 'Email Input' }, 
-  ];
+   
+      {
+        id: 'button-1',       
+        label: 'Button',      
+        type: 'button',       
+        required: false,    
+      },
+    ];
+ 
 
   const handleDragEnd = (result) => {
     const { destination, source } = result;
