@@ -5,7 +5,6 @@ import Sidebar from './components/Sidebar';
 import DropArea from './components/DropArea';
 
 const App = () => {
-  // State to hold dropped components
   const [droppedComponents, setDroppedComponents] = useState([]);
 
   const components = [
@@ -16,47 +15,41 @@ const App = () => {
     { type: 'date', label: 'Date Picker' },
     { type: 'file', label: 'File Upload' },
     { type: 'number', label: 'Number Input' },
-    { type: 'email', label: 'Email Input' }, 
-   
-      {
-        id: 'button-1',       
-        label: 'Button',      
-        type: 'button',       
-        required: false,    
-      },
-    ];
- 
+    { type: 'email', label: 'Email Input' },
+    {
+      id: 'button-1',
+      label: 'Button',
+      type: 'button',
+      required: false,
+    },
+  ];
 
   const handleDragEnd = (result) => {
     const { destination, source } = result;
 
-    // If dropped outside the list
     if (!destination) {
       return;
     }
 
-    // Handle adding component to DropArea
     if (source.droppableId === 'sidebar' && destination.droppableId === 'drop-area-id') {
       const newComponent = { 
         ...components[source.index], 
-        id: `${components[source.index].type}-${Date.now()}` // Unique ID
+        id: `${components[source.index].type}-${Date.now()}`
       };
-      setDroppedComponents((prev) => [...prev, newComponent]); // Add it to dropped components
+      setDroppedComponents((prev) => [...prev, newComponent]);
     }
 
-    // Handle rearranging components within DropArea
     if (source.droppableId === 'drop-area-id' && destination.droppableId === 'drop-area-id') {
       const reorderedComponents = Array.from(droppedComponents);
       const [removed] = reorderedComponents.splice(source.index, 1);
       reorderedComponents.splice(destination.index, 0, removed);
-      setDroppedComponents(reorderedComponents); // Update the order of dropped components
+      setDroppedComponents(reorderedComponents);
     }
   };
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="App flex flex-col md:flex-row">
-        {/* Sidebar as a static draggable source */}
         <Droppable droppableId="sidebar" isDropDisabled={true}>
           {(provided) => (
             <div ref={provided.innerRef} {...provided.droppableProps} className="sidebar-container p-4">
@@ -66,7 +59,6 @@ const App = () => {
           )}
         </Droppable>
 
-        {/* DropArea where multiple components can be dropped */}
         <Droppable droppableId="drop-area-id">
           {(provided) => (
             <div ref={provided.innerRef} {...provided.droppableProps} className="drop-area-container p-4 border-l-2">
@@ -84,3 +76,4 @@ const App = () => {
 };
 
 export default App;
+ 

@@ -14,10 +14,10 @@ const DropArea = ({ droppedComponents }) => {
     const initialData = droppedComponents.map(component => ({
       id: component.id,
       label: component.label,
-      value: component.value || '', // Ensure value is set correctly
+      value: component.value || '',
       type: component.type,
       required: component.required || false,
-      options: component.options || [], // Initialize options for select components
+      options: component.options || [],
     }));
     setSubmittedData(initialData);
   }, [droppedComponents]);
@@ -54,7 +54,6 @@ const DropArea = ({ droppedComponents }) => {
   const renderFinalForm = () => {
     return submittedData.map(data => (
       <div key={data.id} className="mb-4">
-        {/* Remove the label for the button type */}
         {data.type === 'button' ? (
           <button className="p-2 bg-blue-500 text-white rounded mt-1">
             {editableLabels[data.id] || 'Button'}
@@ -67,7 +66,7 @@ const DropArea = ({ droppedComponents }) => {
                 type="checkbox"
                 checked={data.value}
                 readOnly
-                onChange={() => handleInputChange(data.id, !data.value)} // Toggle checkbox value
+                onChange={() => handleInputChange(data.id, !data.value)}
                 className="mr-2"
                 aria-label={editableLabels[data.id] || data.label}
               />
@@ -75,7 +74,7 @@ const DropArea = ({ droppedComponents }) => {
               <textarea
                 value={data.value}
                 placeholder={editablePlaceholders[data.id] || "Enter text"}
-                onChange={e => handleInputChange(data.id, e.target.value)} // Allow textarea editing
+                onChange={e => handleInputChange(data.id, e.target.value)}
                 className="border border-gray-300 p-2 rounded mt-1 w-full"
                 aria-label={editablePlaceholders[data.id] || "Enter text"}
               />
@@ -97,7 +96,7 @@ const DropArea = ({ droppedComponents }) => {
                 type={data.type}
                 value={data.value}
                 placeholder={editablePlaceholders[data.id] || "Enter text"}
-                onChange={e => handleInputChange(data.id, e.target.value)} // Allow input editing
+                onChange={e => handleInputChange(data.id, e.target.value)}
                 className="border border-gray-300 p-2 rounded mt-1 w-full"
                 aria-label={editablePlaceholders[data.id] || "Enter text"}
               />

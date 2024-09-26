@@ -1,8 +1,8 @@
-//reducers/index.js
+
 import { combineReducers } from 'redux';
 
 const initialState = {
-  components: [], // Initially, no components are dropped
+  components: [], 
 };
 
 const formReducer = (state = initialState, action) => {
