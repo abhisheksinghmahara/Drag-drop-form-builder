@@ -8,19 +8,16 @@ const App = () => {
   // State to hold dropped components
   const [droppedComponents, setDroppedComponents] = useState([]);
 
-const components = [
-  { type: 'input', label: 'Input Field' },
-  { type: 'textarea', label: 'Textarea' },
-  { type: 'select', label: 'Select Dropdown' },
-  { type: 'checkbox', label: 'Checkbox' },
-  { type: 'radio', label: 'Radio Button' },
-  { type: 'date', label: 'Date Picker' },
-  { type: 'file', label: 'File Upload' },
-  { type: 'number', label: 'Number Input' }, 
-  { type: 'range', label: 'Range (0 to 150)' }, 
-];
-
-  // Example components
+  const components = [
+    { type: 'input', label: 'Input Field' },
+    { type: 'textarea', label: 'Textarea' },
+    { type: 'select', label: 'Select Dropdown' },
+    { type: 'checkbox', label: 'Checkbox' },
+    { type: 'date', label: 'Date Picker' },
+    { type: 'file', label: 'File Upload' },
+    { type: 'number', label: 'Number Input' },
+    { type: 'email', label: 'Email Input' }, 
+  ];
 
   const handleDragEnd = (result) => {
     const { destination, source } = result;
@@ -55,7 +52,7 @@ const components = [
         <Droppable droppableId="sidebar" isDropDisabled={true}>
           {(provided) => (
             <div ref={provided.innerRef} {...provided.droppableProps} className="sidebar-container p-4">
-              <Sidebar components={components} />
+              <Sidebar components={components} setDroppedComponents={setDroppedComponents} />
               {provided.placeholder}
             </div>
           )}
@@ -65,7 +62,10 @@ const components = [
         <Droppable droppableId="drop-area-id">
           {(provided) => (
             <div ref={provided.innerRef} {...provided.droppableProps} className="drop-area-container p-4 border-l-2">
-              <DropArea droppedComponents={droppedComponents} />
+              <DropArea 
+                droppedComponents={droppedComponents} 
+                setDroppedComponents={setDroppedComponents} 
+              />
               {provided.placeholder}
             </div>
           )}
@@ -76,4 +76,3 @@ const components = [
 };
 
 export default App;
-
